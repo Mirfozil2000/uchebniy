@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Формула 1 и мировая экономика</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      .lead {
+        color: var(--muted);
+        font-size: 18px;
+        max-width: 900px;
+      }
+      :root {
+        --bg: #0e0e11;
+        --card: #16161b;
+        --text: #eaeaf0;
+        --muted: #9a9aa3;
+        --accent: #e10600; /* F1 red */
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.7;
+      }
+
+      header {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px 20px;
+        background: linear-gradient(
+            to bottom,
+            rgba(14, 14, 17, 0.85),
+            rgba(14, 14, 17, 1)
+          ),
+          url("https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1600&q=80")
+            center/cover no-repeat;
+      }
+
+      header h1 {
+        font-size: clamp(32px, 5vw, 56px);
+        margin-bottom: 20px;
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        color: var(--muted);
+        max-width: 700px;
+        margin: 0 auto;
+        font-size: 18px;
+      }
+
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(14, 14, 17, 0.8);
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        padding: 14px 10px;
+        border-bottom: 1px solid #222;
+      }
+
+      nav a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 14px;
+        transition: color 0.3s;
+      }
+
+      nav a:hover {
+        color: var(--text);
+      }
+
+      section {
+        padding: 90px 10%;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      section img {
+        width: 100%;
+        border-radius: 18px;
+        margin: 30px 0;
+        opacity: 0.9;
+      }
+
+      h2 {
+        font-size: 32px;
+        margin-bottom: 20px;
+        letter-spacing: -0.02em;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+        margin-top: 30px;
+      }
+
+      .card {
+        background: var(--card);
+        padding: 28px;
+        border-radius: 20px;
+        border: 1px solid #222;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .counter {
+        font-size: 37px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+
+      .timeline {
+        border-left: 2px solid var(--accent);
+        padding-left: 28px;
+        margin-top: 40px;
+      }
+
+      .event {
+        margin-bottom: 26px;
+        color: var(--muted);
+      }
+
+      canvas {
+        background: #fff;
+        border-radius: 18px;
+        padding: 16px;
+        margin-top: 30px;
+      }
+
+      .fade {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.8s ease;
+      }
+
+      .fade.show {
+        opacity: 1;
+        transform: none;
+      }
+
+      footer {
+        padding: 60px 20px;
+        text-align: center;
+        color: var(--muted);
+        border-top: 1px solid #222;
+      }
+
+      @media (max-width: 1024px) {
+        section {
+          padding: 60px 8%;
+        }
+        h2 {
+          font-size: 28px;
+        }
+        .grid {
+          gap: 16px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        section {
+          padding: 50px 5%;
+        }
+        header {
+          padding: 30px 15px;
+        }
+        header h1 {
+          font-size: clamp(24px, 8vw, 40px);
+        }
+        header p {
+          font-size: 16px;
+        }
+        nav {
+          flex-wrap: wrap;
+          gap: 16px;
+          padding: 10px;
+        }
+        nav a {
+          font-size: 13px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        canvas {
+          width: 100% !important;
+          height: auto !important;
+        }
+      }
+
+      @media (max-width: 480px) {
+        header h1 {
+          font-size: clamp(20px, 8vw, 32px);
+        }
+        header p {
+          font-size: 14px;
+        }
+        .counter {
+          font-size: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Формула 1 и мировая экономика</h1>
+        <p>
+          Интерактивный аналитический проект: Формула 1 как глобальная
+          индустрия, рынок технологий и элемент мировой экономической системы.
+        </p>
+      </div>
+    </header>
+
+    <nav>
+      <a href="#t1">Тема 1</a>
+      <a href="#t2">Тема 2</a>
+      <a href="#t3">Тема 3</a>
+      <a href="#t4">Тема 4</a>
+      <a href="#t5">Тема 5</a>
+      <a href="#t6">Тема 6</a>
+      <a href="#t7">Тема 7</a>
+    </nav>
+
+    <section id="t1" class="fade">
+      <h2>1. Формула 1 и международное разделение труда</h2>
+      <p class="lead">
+        Формула 1 является наглядным примером современного международного
+        разделения труда. Индустрия объединяет высокоспециализированные
+        производства, научные центры, сервисные компании и рынки услуг,
+        распределённые по разным странам в зависимости от их сравнительных
+        преимуществ.
+      </p>
+      <img
+        src="https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=1200&q=80"
+        alt="F1 factory"
+      />
+      <div class="grid">
+        <div class="card">
+          <p>
+            Большинство команд базируются в Великобритании и Италии благодаря
+            концентрации инженерных кадров и поставщиков.
+          </p>
+        </div>
+        <div class="card">
+          <p>
+            Компоненты болидов производятся в разных странах, формируя
+            глобальные цепочки добавленной стоимости.
+          </p>
+        </div>
+        <div class="card">
+          <p>
+            Ф1 демонстрирует классическую модель международной специализации.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="t2" class="fade">
+      <h2>2. Формула 1 как элемент мирового рынка услуг</h2>
+      <p class="lead">
+        С точки зрения мировой экономики Формула 1 относится преимущественно к
+        третичному сектору, так как основной доход формируется за счёт услуг:
+        медиаправ, рекламы, лицензирования бренда и организации международных
+        мероприятий.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <p>
+            Ф1 продаёт медиаправа, лицензии и рекламные пакеты более чем в 180
+            странах.
+          </p>
+        </div>
+        <div class="card">
+          <p>Гран-при создают спрос на туристические и транспортные услуги.</p>
+        </div>
+        <div class="card">
+          <p>
+            Индустрия моды использует Ф1 как глобальную рекламную платформу.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="t3" class="fade">
+      <h2>3. Историческое развитие мировой автоиндустрии</h2>
+      <p class="lead">
+        Эволюция Формулы 1 тесно связана с этапами формирования мирового
+        хозяйства. От национальных автопроизводителей середины XX века чемпионат
+        постепенно трансформировался в глобальную индустрию, управляемую
+        транснациональными корпорациями.
+      </p>
+      <img
+        src="https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1200&q=80"
+        alt="Classic F1"
+      />
+      <div class="timeline">
+        <div class="event">
+          <strong>1950</strong> — начало чемпионата мира Формулы 1
+        </div>
+        <div class="event">
+          <strong>1980-е</strong> — коммерциализация и глобальное ТВ
+        </div>
+        <div class="event">
+          <strong>2000-е</strong> — эпоха ТНК и крупных спонсоров
+        </div>
+        <div class="event"><strong>2021</strong> — бюджетный лимит</div>
+        <div class="event">
+          <strong>2030</strong> — цель углеродной нейтральности
+        </div>
+      </div>
+    </section>
+
+    <section id="t4" class="fade">
+      <h2>4. Ключевые экономические показатели</h2>
+      <p class="lead">
+        Экономическое значение Формулы 1 выходит далеко за рамки спортивных
+        соревнований. Индустрия формирует значительный вклад в занятость,
+        инвестиции и развитие сопутствующих отраслей мировой экономики.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <div class="counter" data-target="2000000000">0</div>
+          <p>Годовой доход ($)</p>
+        </div>
+        <div class="card">
+          <div class="counter" data-target="500000">0</div>
+          <p>Рабочие места</p>
+        </div>
+        <div class="card">
+          <div class="counter" data-target="24">0</div>
+          <p>Стран в календаре</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="t5" class="fade">
+      <h2>5. Бюджеты команд Формулы 1</h2>
+      <p class="lead">
+        Финансовая структура Формулы 1 отражает высокую капиталоёмкость отрасли.
+        Даже в условиях бюджетного лимита команды оперируют сотнями миллионов
+        долларов, инвестируемых в технологии, персонал и инфраструктуру.
+      </p>
+      <canvas id="budgetChart"></canvas>
+    </section>
+
+    <section id="t6" class="fade">
+      <h2>6. Технологии и инновации</h2>
+      <p class="lead">
+        Формула 1 выполняет функцию глобальной исследовательской лаборатории для
+        автомобильной промышленности. Инновации, разработанные в условиях
+        жёсткой конкуренции, со временем находят применение в серийном
+        производстве.
+      </p>
+      <div class="grid">
+        <div class="card"><p>Гибридные силовые установки и биотопливо</p></div>
+        <div class="card"><p>Big Data, телеметрия и симуляторы</p></div>
+        <div class="card"><p>Трансфер технологий в серийное авто</p></div>
+      </div>
+    </section>
+
+    <section id="t7" class="fade">
+      <h2>7. Будущее Формулы 1 в мировой экономике</h2>
+      <p class="lead">
+        Перспективы развития Формулы 1 определяются глобальными экономическими
+        трендами: устойчивым развитием, цифровизацией и изменением структуры
+        мирового спроса.
+      </p>
+      <div class="grid">
+        <div class="card"><p>Рост рынков Азии и Ближнего Востока</p></div>
+        <div class="card"><p>ESG, устойчивое развитие и экология</p></div>
+        <div class="card"><p>Искусственный интеллект и цифровизация</p></div>
+      </div>
+    </section>
+
+    <footer>
+      Формула 1 и мировая экономика <br />
+      Abduvahabova Nozanin
+    </footer>
+
+    <script>
+      // scroll animation
+      const fades = document.querySelectorAll(".fade");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) e.target.classList.add("show");
+          });
+        },
+        { threshold: 0.15 }
+      );
+      fades.forEach((el) => observer.observe(el));
+
+      // counters
+      const counters = document.querySelectorAll(".counter");
+      counters.forEach((counter) => {
+        const update = () => {
+          const target = +counter.dataset.target;
+          const current = +counter.innerText.replace(/\s/g, "");
+          const inc = target / 120;
+          if (current < target) {
+            counter.innerText = Math.ceil(current + inc);
+            setTimeout(update, 20);
+          } else {
+            counter.innerText = target.toLocaleString("ru-RU");
+          }
+        };
+        update();
+      });
+
+      // chart
+      new Chart(document.getElementById("budgetChart"), {
+        type: "bar",
+        data: {
+          labels: ["Mercedes", "Red Bull", "Ferrari", "McLaren"],
+          datasets: [
+            {
+              label: "Бюджет, млн $",
+              data: [135, 130, 140, 120],
+              backgroundColor: "#e10600",
+            },
+          ],
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } },
+        },
+      });
+    </script>
+  </body>
+</html>
